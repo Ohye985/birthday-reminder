@@ -1,0 +1,30 @@
+body {
+  background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+  /* background: #659999; fallback for old browsers
+  background: -webkit-linear-gradient(
+    to right,
+    #f4791f,
+    #659999
+  ); Chrome 10-25, Safari 5.1-6
+  background: linear-gradient(
+    to right,
+    #f4791f,
+    #659999
+  ); W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: rgb(235, 229, 229);
+}
+input {
+  width: 35%;
+  padding: 10px;
+  border: 1px solid rgb(56, 55, 55);
+  border-radius: 5px;
+  outline: none;
+}
+span {
+  margin-bottom: 5px;
+}
+button {
+  padding: 9px 20px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
