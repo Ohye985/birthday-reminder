@@ -46,13 +46,13 @@ async function sendBirthdayEmail(user) {
       email: process.env.FROM_EMAIL,
       name: process.env.FROM_NAME || "Birthday Wisher",
     },
-    subject: "🎉 Happy Birthday!",
+    subject: "Happy Birthday! 🎉",
     text: `Happy Birthday, ${user.username}! 🎂`,
     html: `
       <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
         <h1>🎉 Happy Birthday, ${user.username}! 🎂</h1>
         <p>Wishing you joy, happiness, and success today and always.</p>
-        <p style="margin-top: 30px;">— The Birthday Wisher App</p>
+        <p style="margin-top: 30px;">— Ohye Enterprise</p>
       </div>
     `,
   };
