@@ -10,7 +10,7 @@ Built with **React (frontend)**, **Node.js + Express (backend)**, and **MongoDB*
 - Store users in a MongoDB database (with unique email enforcement).
 - A **cron job** runs daily at **7 AM** to:
   - Check whose birthday it is today.
-  - Send personalized birthday emails using **Nodemailer + Gmail**.
+  - Sends a **Happy Birthday email** using **SendGrid (email delivery)**.
 - Simple UI showing:
   - Form to add users.
   - Table of saved users.
@@ -20,9 +20,9 @@ Built with **React (frontend)**, **Node.js + Express (backend)**, and **MongoDB*
 
 ## 🛠️ Tech Stack
 - **Frontend**: React, Fetch API
-- **Backend**: Node.js, Express, Nodemailer, Node-Cron
+- **Backend**: Node.js, Express, Node-Cron
 - **Database**: MongoDB + Mongoose
-- **Email Provider**: Gmail (App Passwords required)
+- **Email Service**: Sendgrid
 
 ---
 
@@ -51,8 +51,8 @@ npm install
 
 PORT=4000
 MONGO_URI=mongodb://127.0.0.1:27017/birthday_reminder
-GMAIL_USER=yourgmail@gmail.com
-GMAIL_PASS=your_app_password
+SENDGRID_API_KEY=your_sendgrid_api_key
+FROM_EMAIL=no-reply@yourdomain.com
 FROM_NAME=Your Business Name
 CRON_TIME=0 7 * * *
 

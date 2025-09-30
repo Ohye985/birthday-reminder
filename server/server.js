@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodeCron = require('node-cron');
-const nodemailer = require('nodemailer');
+const sgMail = require("@sendgrid/mail");
 
 const connectDB = require('./db');
 const routes = require('./routes');
@@ -19,45 +19,53 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Sendgrid setup
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 app.use('/api', routes);
 
 app.get('/', (req, res) => res.send('Birthday Wisher API is running'));
 
-// Setup nodemailer transporter (Gmail)
-// For production consider a dedicated transactional email provider
-const transport = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
+// Sendgrid Birthday Email Function
+async function sendBirthdayEmail(user) {
+  if (!user.email || typeof user.email !== "string") {
+    console.error(`[MAILER] Skipped: invalid email for user ${user.username}`);
+    return;
   }
-});
 
-// send email helper
-async function sendBirthdayEmail(toEmail, username) {
-  const fromName = process.env.FROM_NAME || 'Birthday Team';
-  const mailOptions = {
-    from: `${fromName} <${process.env.GMAIL_USER}>`,
-    to: toEmail,
-    subject: `Happy Birthday, ${username}! 🎉`,
+  const recipient = user.email.trim();
+  if (!recipient) {
+    console.error(`[MAILER] Skipped: empty email for user ${user.username}`);
+    return;
+  }
+
+  const msg = {
+    to: user.email,
+    from: {
+      email: process.env.FROM_EMAIL,
+      name: process.env.FROM_NAME || "Birthday Wisher",
+    },
+    subject: "🎉 Happy Birthday!",
+    text: `Happy Birthday, ${user.username}! 🎂`,
     html: `
-      <div style="font-family: Arial, sans-serif; line-height:1.4;">
-        <h2 style="margin-bottom:0.2rem">Happy Birthday, ${username} 🎂</h2>
-        <p>Wishing you a joyful day filled with love, laughter, and cake.</p>
-        <p><em>Warm wishes from ${fromName}.</em></p>
-        <hr />
-        <small>If you no longer want these emails, reply with 'unsubscribe'.</small>
+      <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+        <h1>🎉 Happy Birthday, ${user.username}! 🎂</h1>
+        <p>Wishing you joy, happiness, and success today and always.</p>
+        <p style="margin-top: 30px;">— The Birthday Wisher App</p>
       </div>
-    `
+    `,
   };
 
-  return transport.sendMail(mailOptions, function(error, info) {
-    if (error) {
-    console.log(`Error: ${error}`);
-  } else {
-    console.log('Email sent: ' + info.response);
+  try {
+    await sgMail.send(msg);
+    console.log(`[MAILER] Sent birthday email to ${user.email}`);
+  } catch (error) {
+    console.error("[MAILER] Error sending email:", error.message);
+    if (error.response) {
+      console.error(error.response.body);
+    }
   }
-  });
 }
 
 // Cron job — runs at CRON_TIME daily
@@ -80,7 +88,7 @@ nodeCron.schedule(
       console.log(`[CRON] Sending ${users.length} birthday email(s)`);
       for (const u of users) {
         try {
-          await sendBirthdayEmail(u.email, u.username);
+          await sendBirthdayEmail(u);
           console.log(`[CRON] Sent email to ${u.email}`);
         } catch (err) {
           console.error(`[CRON] Error sending to ${u.email}:`, err);
